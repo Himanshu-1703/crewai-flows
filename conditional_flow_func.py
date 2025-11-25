@@ -1,8 +1,7 @@
 from crewai.flow.flow import Flow, start, listen, and_
 from typing import Any
 
-
-# define our custom flow
+# create the flow
 class MyConditionalFlow(Flow):
     
     # define the start node
@@ -10,39 +9,40 @@ class MyConditionalFlow(Flow):
     def start_node(self) -> str:
         return "Flow Started"
     
-    # define the person name node
+    # define the second node
     @listen(start_node)
-    def set_person_name(self) -> str:
+    def person_name(self) -> str:
         name = "Aman"
+        # add the name to state
         self.state["name"] = name
         return name
     
-    # define the person age node
+    # define the third node
     @listen(start_node)
-    def set_person_age(self) -> int:
+    def person_age(self) -> int:
         age = 25
+        # add age to state
         self.state["age"] = age
         return age
     
-    # define the merge node --> and condition
-    @listen(and_(set_person_name, set_person_age))
-    def merge_data_node(self) -> dict[str, Any]:
+    # define the fourth node
+    @listen(and_(person_name, person_age))
+    def person_info(self) -> dict[str, Any]:
+        name = self.state["name"] 
+        age = self.state["age"]
         person_dict = {
-            "name": self.state["name"],
-            "age": self.state["age"]
+            "name": name,
+            "age": age
         }
-        
         return person_dict
     
 if __name__ == "__main__":
-    # create the flow
     flow = MyConditionalFlow()
     
-    # kickoff the fflow
-    flow_output = flow.kickoff()
+    # execute the flow
+    result = flow.kickoff()
     
     # plot the flow
     flow.plot("conditional_flow.html")
     
-    # print the result
-    print("Flow Output: ", flow_output)
+    print(f"Flow Output: {result}")
